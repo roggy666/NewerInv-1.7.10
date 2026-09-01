@@ -34,6 +34,13 @@ public final class GridRecipe {
         return n;
     }
 
+    public boolean fits2x2() {
+        if (shapeless) {
+            return ingredientCount() <= 4;
+        }
+        return width <= 2 && height <= 2;
+    }
+
     public String outputName() {
         if (output == null || output.getItem() == null) {
             return "";

@@ -478,25 +478,33 @@ public class BookPanel extends Gui {
     }
 
     private void refilter() {
-        EntityPlayer p = Minecraft.getMinecraft().thePlayer;
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayer p = mc.thePlayer;
         List<GridRecipe> base = RecipeIndex.query(search, p != null ? p.inventory : null, craftableOnly);
 
-        if (activeTab == 0) {
-            results = base;
-        } else {
-            List<GridRecipe> f = new ArrayList<GridRecipe>();
-            for (GridRecipe r : base) {
-                Item it = r.output.getItem();
-                if (it == null) {
-                    continue;
-                }
-                CreativeTabs tab = it.getCreativeTab();
-                if (matchesCategory(activeTab, tab)) {
+        boolean filter2x2 = false;
+        if (!Config.show3x3In2x2Inventory && p != null && p.openContainer != null) {
+            GridLayout layout = GridLayout.detect(p.openContainer);
+            if (layout != null && layout.gridWidth <= 2) {
+                filter2x2 = true;
+            }
+        }
+
+        List<GridRecipe> f = new ArrayList<GridRecipe>();
+        for (GridRecipe r : base) {
+            if (filter2x2 && !r.fits2x2()) {
+                continue;
+            }
+            if (activeTab == 0) {
+                f.add(r);
+            } else {
+                Item it = (r.output != null) ? r.output.getItem() : null;
+                if (it != null && matchesCategory(activeTab, it.getCreativeTab())) {
                     f.add(r);
                 }
             }
-            results = f;
         }
+        results = f;
         page = Math.min(page, maxPage());
         dirty = false;
     }

@@ -14,7 +14,7 @@ import net.minecraftforge.common.MinecraftForge;
 @Mod(
         modid = NewerInv.MODID,
         name = "NewerInv",
-        version = "1.0.2",
+        version = "1.0.3",
         acceptedMinecraftVersions = "[1.7.10]"
 )
 public class NewerInv {
