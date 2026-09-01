@@ -1,9 +1,14 @@
 package com.example.newerinv.client;
 
+import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -17,17 +22,20 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
     private static final ResourceLocation inventoryGuiTextures =
             new ResourceLocation("textures/gui/container/inventory.png");
 
+    private int lastAnchorLeft = Integer.MIN_VALUE;
+    private final Set<GuiButton> adjustedButtons = new HashSet<GuiButton>();
+
     public GuiInventoryBook(EntityPlayer player) {
         super(player);
     }
 
-    public int getSlotXOffset() {
-        if (this.inventorySlots != null && this.inventorySlots.inventorySlots != null) {
+    private int getSlotXOffset() {
+        if (this.inventorySlots != null && this.inventorySlots.inventorySlots != null && this.mc != null && this.mc.thePlayer != null) {
             for (Object obj : this.inventorySlots.inventorySlots) {
                 if (obj instanceof Slot) {
-                    Slot s = (Slot) obj;
-                    if (s.inventory == this.mc.thePlayer.inventory && s.getSlotIndex() == 9) {
-                        return s.xDisplayPosition - 8;
+                    Slot slot = (Slot) obj;
+                    if (slot.inventory == this.mc.thePlayer.inventory && slot.getSlotIndex() == 0) {
+                        return slot.xDisplayPosition - 8;
                     }
                 }
             }
@@ -35,38 +43,144 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
         return 0;
     }
 
+    private Slot findOffhandSlot() {
+        if (this.inventorySlots != null && this.inventorySlots.inventorySlots != null) {
+            for (Object obj : this.inventorySlots.inventorySlots) {
+                if (obj instanceof Slot) {
+                    Slot slot = (Slot) obj;
+                    String name = slot.getClass().getName();
+                    if (name.contains("Backhand") || name.contains("Offhand") || name.contains("OffHand")) {
+                        return slot;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public void updateTabRegistry() {
+        try {
+            Class<?> reg = Class.forName("tconstruct.client.tabs.TabRegistry");
+            Class<?> vanillaTab = Class.forName("tconstruct.client.tabs.InventoryTabVanilla");
+            Method m = reg.getMethod("updateTabValues", int.class, int.class, Class.class);
+            int cornerX = this.guiLeft + getSlotXOffset();
+            int cornerY = this.guiTop;
+            m.invoke(null, cornerX, cornerY, vanillaTab);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private boolean isTabButton(GuiButton btn) {
+        if (btn == null) {
+            return false;
+        }
+        String name = btn.getClass().getName();
+        return name.contains("Tab") || name.contains("tab");
+    }
+
     @Override
     public void initGui() {
         super.initGui();
+        adjustedButtons.clear();
+        lastAnchorLeft = Integer.MIN_VALUE;
         PotionEffectRenderer.disableVanillaPotionEffects(this);
+        int initialLeft = (this.width - this.xSize) / 2;
         updateScreenPosition();
-        int offset = getSlotXOffset();
-        panel.init(this, 104 + offset, 61);
+        adjustButtons(initialLeft, this.buttonList);
+        updateTabRegistry();
+        panel.init(this, 104, 61);
+    }
+
+    public void adjustPostButtons(List buttonList) {
+        int initialLeft = (this.width - this.xSize) / 2;
+        adjustButtons(initialLeft, buttonList);
+        updateTabRegistry();
+    }
+
+    private void adjustButtons(int baseLeft, List buttons) {
+        if (buttons == null) {
+            return;
+        }
+        int targetAnchor = anchorLeft();
+        for (Object obj : buttons) {
+            if (obj instanceof GuiButton) {
+                GuiButton btn = (GuiButton) obj;
+                if (isTabButton(btn)) {
+                    continue;
+                }
+                if (adjustedButtons.add(btn)) {
+                    int delta = targetAnchor - baseLeft;
+                    btn.xPosition += delta;
+                }
+            }
+        }
     }
 
     @Override
     public void updateScreenPosition() {
+        int oldAnchor = (lastAnchorLeft != Integer.MIN_VALUE) ? lastAnchorLeft : anchorLeft();
+        int offX = getSlotXOffset();
         if (BookPanel.isOpen()) {
-            this.guiLeft = (this.width - 147 - this.xSize) / 2 + 147;
+            this.guiLeft = (this.width - 147 - (this.xSize + offX)) / 2 + 147;
         } else {
-            this.guiLeft = (this.width - this.xSize) / 2;
+            this.guiLeft = (this.width - (this.xSize + offX)) / 2;
         }
         this.guiTop = (this.height - this.ySize) / 2;
+
+        int newAnchor = anchorLeft();
+        if (lastAnchorLeft != Integer.MIN_VALUE && this.buttonList != null) {
+            int deltaX = newAnchor - oldAnchor;
+            if (deltaX != 0) {
+                for (Object obj : this.buttonList) {
+                    if (obj instanceof GuiButton) {
+                        GuiButton btn = (GuiButton) obj;
+                        if (!isTabButton(btn)) {
+                            btn.xPosition += deltaX;
+                        }
+                    }
+                }
+            }
+        }
+        updateTabRegistry();
+        lastAnchorLeft = newAnchor;
+    }
+
+    @Override
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+        this.fontRendererObj.drawString(I18n.format("container.crafting"), 86 + getSlotXOffset(), 16, 4210752);
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(inventoryGuiTextures);
-        int offset = getSlotXOffset();
-        this.drawTexturedModalRect(this.guiLeft + offset, this.guiTop, 0, 0, this.xSize, this.ySize);
-        func_147046_a(this.guiLeft + 51 + offset, this.guiTop + 75, 30, (float)(this.guiLeft + 51 + offset) - (float)mouseX, (float)(this.guiTop + 75 - 50) - (float)mouseY, this.mc.thePlayer);
+        int offX = getSlotXOffset();
+        this.drawTexturedModalRect(this.guiLeft + offX, this.guiTop, 0, 0, this.xSize, this.ySize);
+        func_147046_a(this.guiLeft + offX + 51, this.guiTop + 75, 30, (float)(this.guiLeft + offX + 51) - (float)mouseX, (float)(this.guiTop + 75 - 50) - (float)mouseY, this.mc.thePlayer);
+
+        Slot offhandSlot = findOffhandSlot();
+        if (offhandSlot != null) {
+            int sx = this.guiLeft + offhandSlot.xDisplayPosition - 2;
+            int sy = this.guiTop + offhandSlot.yDisplayPosition - 2;
+            boolean rendered = false;
+            try {
+                Class<?> helper = Class.forName("xonin.backhand.client.utils.BackhandRenderHelper");
+                Method m = helper.getMethod("drawItemStackSlot", int.class, int.class);
+                m.invoke(null, sx, sy);
+                rendered = true;
+            } catch (Throwable ignored) {
+            }
+            if (!rendered) {
+                this.mc.getTextureManager().bindTexture(inventoryGuiTextures);
+                this.drawTexturedModalRect(sx + 1, sy + 1, 7, 83, 18, 18);
+            }
+        }
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
-        PotionEffectRenderer.renderCleanPotionEffects(this, getSlotXOffset(), true);
+        PotionEffectRenderer.renderCleanPotionEffects(this, 0, true);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glDisable(GL11.GL_LIGHTING);
         panel.draw(this, mouseX, mouseY);

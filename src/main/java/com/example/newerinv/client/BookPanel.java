@@ -107,7 +107,6 @@ public class BookPanel extends Gui {
             ghostRecipe = null;
         }
 
-        // Tabs
         for (int i = 0; i < 4; i++) {
             int tabY = bookY + 3 + i * 27;
             int tabX = (i == activeTab) ? (bookX - 30) : (bookX - 28);
@@ -125,7 +124,6 @@ public class BookPanel extends Gui {
             }
         }
 
-        // Craftable filter
         int filterX = bookX + 110;
         int filterY = bookY + 14;
         if (mx >= filterX && mx < filterX + 26 && my >= filterY && my < filterY + 16) {
@@ -137,7 +135,6 @@ public class BookPanel extends Gui {
             return true;
         }
 
-        // Search box
         int boxX = bookX + 25;
         int boxY = bookY + 13;
         int boxW = 81;
@@ -158,7 +155,6 @@ public class BookPanel extends Gui {
             searchField.setFocused(false);
         }
 
-        // Prev page
         int prevX = bookX + 38;
         int prevY = bookY + 137;
         if (page > 0 && mx >= prevX && mx < prevX + 12 && my >= prevY && my < prevY + 17) {
@@ -168,7 +164,6 @@ public class BookPanel extends Gui {
             return true;
         }
 
-        // Next page
         int nextX = bookX + 93;
         int nextY = bookY + 137;
         int totalPages = maxPage() + 1;
@@ -179,7 +174,6 @@ public class BookPanel extends Gui {
             return true;
         }
 
-        // Slots
         int slotIdx = slotAt(mx, my);
         if (slotIdx >= 0 && slotIdx < results.size()) {
             activate(results.get(slotIdx), button);
@@ -279,7 +273,6 @@ public class BookPanel extends Gui {
         GL11.glEnable(GL11.GL_BLEND);
         net.minecraft.client.renderer.OpenGlHelper.glBlendFunc(770, 771, 1, 0);
 
-        // Toggle button
         int toggleX = host.anchorLeft() + toggleBtnXOffset;
         int toggleY = host.anchorTop() + toggleBtnYOffset;
         boolean toggleHovered = (mouseX >= toggleX && mouseX < toggleX + 20 && mouseY >= toggleY && mouseY < toggleY + 18);
@@ -313,7 +306,6 @@ public class BookPanel extends Gui {
             searchField.yPosition = bookY + 16;
         }
 
-        // Tabs
         for (int i = 0; i < 4; i++) {
             int tabY = bookY + 3 + i * 27;
             boolean selected = (i == activeTab);
@@ -336,14 +328,12 @@ public class BookPanel extends Gui {
             }
         }
 
-        // Panel background
         mc.getTextureManager().bindTexture(NewerTextures.RECIPE_BOOK);
         GL11.glEnable(GL11.GL_BLEND);
         net.minecraft.client.renderer.OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         drawTexturedModalRect(bookX, bookY, 1, 1, PANEL_WIDTH, PANEL_HEIGHT);
 
-        // Search field
         if (searchField != null) {
             int boxX = bookX + 25;
             int boxY = bookY + 13;
@@ -361,7 +351,6 @@ public class BookPanel extends Gui {
             }
         }
 
-        // Filter button
         int filterX = bookX + 110;
         int filterY = bookY + 14;
         boolean filterHovered = (mouseX >= filterX && mouseX < filterX + 26 && mouseY >= filterY && mouseY < filterY + 16);
@@ -375,7 +364,6 @@ public class BookPanel extends Gui {
             tipLines = one(StatCollector.translateToLocal(craftableOnly ? "newerinv.filter.craftable" : "newerinv.filter.all"));
         }
 
-        // 5x4 Recipe grid
         EntityPlayer player = mc.thePlayer;
         int hoveredSlot = -1;
 
@@ -414,7 +402,6 @@ public class BookPanel extends Gui {
             }
         }
 
-        // Pagination
         int totalPages = Math.max(1, (results.size() + PAGE_SIZE - 1) / PAGE_SIZE);
         int prevX = bookX + 38;
         int prevY = bookY + 137;
@@ -442,7 +429,6 @@ public class BookPanel extends Gui {
             font.drawString(pageStr, bookX + 71 - strW / 2, bookY + 141, 0xFFFFFF);
         }
 
-        // Ghost Recipe
         if (ghostRecipe != null) {
             ghostRecipe.draw(mc, font, itemRender, host.anchorLeft(), host.anchorTop());
             ItemStack ghostTip = ghostRecipe.getHoveredGhostItem(host.anchorLeft(), host.anchorTop(), mouseX, mouseY);
@@ -451,7 +437,6 @@ public class BookPanel extends Gui {
             }
         }
 
-        // Tooltip for hovered slot
         if (hoveredSlot >= 0 && hoveredSlot < results.size()) {
             tipStack = results.get(hoveredSlot).output;
         }

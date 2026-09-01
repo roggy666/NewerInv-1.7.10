@@ -1,7 +1,6 @@
 package com.example.newerinv.client;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Collection;
 
 import net.minecraft.client.Minecraft;
@@ -37,6 +36,21 @@ public class PotionEffectRenderer {
         }
     }
 
+    public static int getXSize(GuiContainer container) {
+        try {
+            Field f = GuiContainer.class.getDeclaredField("field_146999_f");
+            f.setAccessible(true);
+            return f.getInt(container);
+        } catch (Throwable t) {
+            try {
+                Field f = GuiContainer.class.getDeclaredField("xSize");
+                f.setAccessible(true);
+                return f.getInt(container);
+            } catch (Throwable ignored) {}
+        }
+        return 176;
+    }
+
     public static int getGuiLeft(GuiContainer container) {
         try {
             Field f = GuiContainer.class.getDeclaredField("field_147003_i");
@@ -52,6 +66,20 @@ public class PotionEffectRenderer {
         return (container.width - 176) / 2;
     }
 
+    public static void setGuiLeft(GuiContainer container, int left) {
+        try {
+            Field f = GuiContainer.class.getDeclaredField("field_147003_i");
+            f.setAccessible(true);
+            f.setInt(container, left);
+        } catch (Throwable t) {
+            try {
+                Field f = GuiContainer.class.getDeclaredField("guiLeft");
+                f.setAccessible(true);
+                f.setInt(container, left);
+            } catch (Throwable ignored) {}
+        }
+    }
+
     public static int getGuiTop(GuiContainer container) {
         try {
             Field f = GuiContainer.class.getDeclaredField("field_147009_r");
@@ -65,28 +93,6 @@ public class PotionEffectRenderer {
             } catch (Throwable ignored) {}
         }
         return (container.height - 166) / 2;
-    }
-
-    private static Method drawTexturedModalRectMethod;
-
-    static {
-        try {
-            drawTexturedModalRectMethod = GuiScreen.class.getDeclaredMethod("func_73729_b", int.class, int.class, int.class, int.class, int.class, int.class);
-            drawTexturedModalRectMethod.setAccessible(true);
-        } catch (Throwable t1) {
-            try {
-                drawTexturedModalRectMethod = GuiScreen.class.getDeclaredMethod("drawTexturedModalRect", int.class, int.class, int.class, int.class, int.class, int.class);
-                drawTexturedModalRectMethod.setAccessible(true);
-            } catch (Throwable ignored) {}
-        }
-    }
-
-    private static void drawRect(GuiScreen screen, int x, int y, int u, int v, int w, int h) {
-        if (drawTexturedModalRectMethod != null) {
-            try {
-                drawTexturedModalRectMethod.invoke(screen, x, y, u, v, w, h);
-            } catch (Throwable ignored) {}
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -129,13 +135,11 @@ public class PotionEffectRenderer {
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(inventoryGuiTextures);
 
-            // Draw clean 120px background without 16px black bleed
-            drawRect(container, startX, startY, 0, 166, 115, 32);
-            drawRect(container, startX + 115, startY, 135, 166, 5, 32);
+            container.drawTexturedModalRect(startX, startY, 0, 166, 120, 32);
 
             if (potion.hasStatusIcon()) {
                 int iconIndex = potion.getStatusIconIndex();
-                drawRect(container, startX + 6, startY + 7, (iconIndex % 8) * 18, 198 + (iconIndex / 8) * 18, 18, 18);
+                container.drawTexturedModalRect(startX + 6, startY + 7, (iconIndex % 8) * 18, 198 + (iconIndex / 8) * 18, 18, 18);
             }
 
             String name = I18n.format(potion.getName());

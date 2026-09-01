@@ -64,7 +64,6 @@ public class GhostRecipe {
         EntityPlayer player = mc.thePlayer;
         ItemCount avail = player != null ? ItemCount.of(player.inventory) : null;
 
-        // Draw ghost ingredient items in crafting grid
         for (Map.Entry<Slot, ItemStack> entry : ghostSlots.entrySet()) {
             Slot slot = entry.getKey();
             ItemStack stack = entry.getValue();
@@ -106,7 +105,6 @@ public class GhostRecipe {
             GL11.glEnable(GL11.GL_DEPTH_TEST);
         }
 
-        // Draw ghost result item with reddish background
         if (resultSlot != null && !resultSlot.getHasStack() && resultItem != null) {
             int rx = guiLeft + resultSlot.xDisplayPosition;
             int ry = guiTop + resultSlot.yDisplayPosition;
