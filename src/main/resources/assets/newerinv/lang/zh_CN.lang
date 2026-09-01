@@ -1,0 +1,15 @@
+newerinv.search=搜索...
+newerinv.book.show=显示配方书
+newerinv.book.hide=隐藏配方书
+newerinv.filter.all=显示所有配方
+newerinv.filter.craftable=仅显示可合成的配方
+newerinv.shapeless=无序
+newerinv.tab.all=搜索
+newerinv.tab.blocks=建筑方块
+newerinv.tab.decor=装饰方块
+newerinv.tab.redstone=红石
+newerinv.tab.transport=交通运输
+newerinv.tab.tools=工具与实用物品
+newerinv.tab.combat=战斗
+newerinv.tab.food=食物
+newerinv.tab.misc=杂项
