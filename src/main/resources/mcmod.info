@@ -1,0 +1,15 @@
+[
+  {
+    "modid": "newerinv",
+    "name": "NewerInv",
+    "description": "Modern-style survival inventory for 1.7.10: recipe book panel, search and click-to-fill crafting.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "authorList": ["roggy666"],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]

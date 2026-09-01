@@ -1,0 +1,33 @@
+# Gradle
+.gradle/
+build/
+bin/
+out/
+
+# Forge / RetroFuturaGradle runtime & cache
+eclipse/
+run/
+.retroFuturaGradle/
+*.log
+*.log.*
+*.lck
+
+# IDE configuration
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.vscode/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Compiled binaries
+*.class
+*.jar
+!gradle/wrapper/*.jar

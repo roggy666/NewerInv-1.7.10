@@ -1,0 +1,66 @@
+plugins {
+    id "java"
+    id "idea"
+    id "eclipse"
+    id "com.gtnewhorizons.retrofuturagradle" version "1.4.2"
+}
+
+group = "com.example.newerinv"
+version = "1.0.0"
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+        vendor = JvmVendorSpec.ADOPTIUM
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.compilerArgs.add("-Xlint:-options")
+}
+
+minecraft {
+    mcVersion = "1.7.10"
+    username = "Dev"
+    extraRunJvmArguments.addAll(["-Xmx2G", "-Xms1G"])
+}
+
+repositories {
+    mavenCentral()
+    maven { url = "https://maven.minecraftforge.net/" }
+}
+
+dependencies {
+}
+
+processResources {
+    def props = [version: project.version.toString(), mcversion: "1.7.10"]
+    inputs.properties(props)
+    filesMatching("mcmod.info") {
+        expand(props)
+    }
+}
+
+jar {
+    archiveBaseName = "NewerInv"
+    manifest {
+        attributes(["FMLCorePluginContainsFMLMod": "false"])
+    }
+}
+
+def modrinthModsDir = project.findProperty("modrinthModsDir")
+
+if (modrinthModsDir) {
+    tasks.register("deployMod", Copy) {
+        dependsOn tasks.named("reobfJar")
+        from("build/libs") {
+            include "NewerInv-${project.version}.jar"
+        }
+        into modrinthModsDir
+        doLast {
+            println "NewerInv-${project.version}.jar -> ${modrinthModsDir}"
+        }
+    }
+    tasks.named("build") { finalizedBy("deployMod") }
+}
