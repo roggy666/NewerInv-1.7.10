@@ -9,6 +9,7 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.InventoryEffectRenderer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
@@ -26,12 +27,27 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
         super(player);
     }
 
+    public int getSlotXOffset() {
+        if (this.inventorySlots != null && this.inventorySlots.inventorySlots != null) {
+            for (Object obj : this.inventorySlots.inventorySlots) {
+                if (obj instanceof Slot) {
+                    Slot s = (Slot) obj;
+                    if (s.inventory == this.mc.thePlayer.inventory && s.getSlotIndex() == 9) {
+                        return s.xDisplayPosition - 8;
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
     @Override
     public void initGui() {
         super.initGui();
         disableVanillaPotionRendering();
         updateScreenPosition();
-        panel.init(this, 104, 61);
+        int offset = getSlotXOffset();
+        panel.init(this, 104 + offset, 61);
     }
 
     private void disableVanillaPotionRendering() {
@@ -62,8 +78,9 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(inventoryGuiTextures);
-        this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
-        func_147046_a(this.guiLeft + 51, this.guiTop + 75, 30, (float)(this.guiLeft + 51) - (float)mouseX, (float)(this.guiTop + 75 - 50) - (float)mouseY, this.mc.thePlayer);
+        int offset = getSlotXOffset();
+        this.drawTexturedModalRect(this.guiLeft + offset, this.guiTop, 0, 0, this.xSize, this.ySize);
+        func_147046_a(this.guiLeft + 51 + offset, this.guiTop + 75, 30, (float)(this.guiLeft + 51 + offset) - (float)mouseX, (float)(this.guiTop + 75 - 50) - (float)mouseY, this.mc.thePlayer);
     }
 
     @Override
@@ -82,9 +99,10 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
             return;
         }
 
-        int startX = this.guiLeft - 124;
+        int offset = getSlotXOffset();
+        int startX = this.guiLeft + offset - 124;
         if (BookPanel.isOpen()) {
-            startX = this.guiLeft - 147 - 124;
+            startX = this.guiLeft + offset - 147 - 124;
         }
         int startY = this.guiTop;
 
@@ -105,7 +123,6 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             this.mc.getTextureManager().bindTexture(inventoryGuiTextures);
 
-            // Draw clean 120px background without 16px black bleed
             this.drawTexturedModalRect(startX, startY, 0, 166, 115, 32);
             this.drawTexturedModalRect(startX + 115, startY, 135, 166, 5, 32);
 
@@ -167,7 +184,7 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
 
     @Override
     public int anchorLeft() {
-        return this.guiLeft;
+        return this.guiLeft + getSlotXOffset();
     }
 
     @Override
