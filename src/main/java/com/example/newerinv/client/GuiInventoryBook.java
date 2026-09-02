@@ -1,9 +1,9 @@
 package com.example.newerinv.client;
 
 import java.lang.reflect.Method;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -22,8 +22,13 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
     private static final ResourceLocation inventoryGuiTextures =
             new ResourceLocation("textures/gui/container/inventory.png");
 
-    private int lastAnchorLeft = Integer.MIN_VALUE;
-    private final Set<GuiButton> adjustedButtons = new HashSet<GuiButton>();
+    /**
+     * Third-party button -> the X it was created with (captured once, before we move it), stored
+     * relative to a vanilla-centered GUI. Every frame the button is re-placed at
+     * anchorLeft() + originOffset, so it tracks the container wherever it actually renders --
+     * including when NEI's LayoutManager.onPreDraw forces guiLeft back to screen center each frame.
+     */
+    private final Map<GuiButton, Integer> buttonOriginOffset = new HashMap<GuiButton, Integer>();
 
     public GuiInventoryBook(EntityPlayer player) {
         super(player);
@@ -78,39 +83,66 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
         return name.contains("Tab") || name.contains("tab");
     }
 
+    private int vanillaCenterLeft() {
+        return (this.width - this.xSize) / 2;
+    }
+
     @Override
     public void initGui() {
         super.initGui();
-        adjustedButtons.clear();
-        lastAnchorLeft = Integer.MIN_VALUE;
+        buttonOriginOffset.clear();
         PotionEffectRenderer.disableVanillaPotionEffects(this);
-        int initialLeft = (this.width - this.xSize) / 2;
         updateScreenPosition();
-        adjustButtons(initialLeft, this.buttonList);
+        trackButtons(this.buttonList);
+        layoutButtons();
         updateTabRegistry();
         panel.init(this, 104, 61);
     }
 
     public void adjustPostButtons(List buttonList) {
-        int initialLeft = (this.width - this.xSize) / 2;
-        adjustButtons(initialLeft, buttonList);
+        trackButtons(buttonList);
+        layoutButtons();
         updateTabRegistry();
     }
 
-    private void adjustButtons(int baseLeft, List buttons) {
+    /**
+     * Record each new third-party button's origin X once, relative to a vanilla-centered GUI (the
+     * same assumption the old delta shift made). Tab buttons are left to updateTabRegistry().
+     */
+    private void trackButtons(List buttons) {
         if (buttons == null) {
             return;
         }
-        int targetAnchor = anchorLeft();
+        int base = vanillaCenterLeft();
         for (Object obj : buttons) {
             if (obj instanceof GuiButton) {
                 GuiButton btn = (GuiButton) obj;
                 if (isTabButton(btn)) {
                     continue;
                 }
-                if (adjustedButtons.add(btn)) {
-                    int delta = targetAnchor - baseLeft;
-                    btn.xPosition += delta;
+                if (!buttonOriginOffset.containsKey(btn)) {
+                    buttonOriginOffset.put(btn, btn.xPosition - base);
+                }
+            }
+        }
+    }
+
+    /**
+     * Re-place every tracked button at the live anchor plus its captured offset. Called every frame
+     * from drawGuiContainerBackgroundLayer (after NEI's guiLeft reset, before the button list is
+     * drawn) and whenever our own layout changes. Absolute, not incremental, so repeated
+     * open/close of the book never accumulates drift.
+     */
+    private void layoutButtons() {
+        if (this.buttonList == null || buttonOriginOffset.isEmpty()) {
+            return;
+        }
+        int anchor = anchorLeft();
+        for (Object obj : this.buttonList) {
+            if (obj instanceof GuiButton) {
+                Integer off = buttonOriginOffset.get(obj);
+                if (off != null) {
+                    ((GuiButton) obj).xPosition = anchor + off;
                 }
             }
         }
@@ -118,7 +150,6 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
 
     @Override
     public void updateScreenPosition() {
-        int oldAnchor = (lastAnchorLeft != Integer.MIN_VALUE) ? lastAnchorLeft : anchorLeft();
         int offX = getSlotXOffset();
         if (BookPanel.isOpen()) {
             this.guiLeft = (this.width - 147 - (this.xSize + offX)) / 2 + 147;
@@ -127,22 +158,8 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
         }
         this.guiTop = (this.height - this.ySize) / 2;
 
-        int newAnchor = anchorLeft();
-        if (lastAnchorLeft != Integer.MIN_VALUE && this.buttonList != null) {
-            int deltaX = newAnchor - oldAnchor;
-            if (deltaX != 0) {
-                for (Object obj : this.buttonList) {
-                    if (obj instanceof GuiButton) {
-                        GuiButton btn = (GuiButton) obj;
-                        if (!isTabButton(btn)) {
-                            btn.xPosition += deltaX;
-                        }
-                    }
-                }
-            }
-        }
+        layoutButtons();
         updateTabRegistry();
-        lastAnchorLeft = newAnchor;
     }
 
     @Override
@@ -152,6 +169,10 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        // Runs after NEI's per-frame guiLeft reset (LayoutManager.onPreDraw) but before GuiScreen
+        // draws the button list, so third-party buttons render aligned with the real container.
+        layoutButtons();
+
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(inventoryGuiTextures);
         int offX = getSlotXOffset();

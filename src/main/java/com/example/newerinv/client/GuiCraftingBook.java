@@ -1,8 +1,11 @@
 package com.example.newerinv.client;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiCrafting;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -13,14 +16,75 @@ public class GuiCraftingBook extends GuiCrafting implements BookHost {
 
     private final BookPanel panel = new BookPanel();
 
+    /**
+     * Third-party button -> the X it was created with, captured once, relative to a vanilla-centered
+     * GUI. Every frame it is re-placed at anchorLeft() + that offset so it follows the container when
+     * the book pushes it aside. Absolute, so repeated open/close never drifts. Mirrors
+     * GuiInventoryBook.
+     */
+    private final Map<GuiButton, Integer> buttonOriginOffset = new HashMap<GuiButton, Integer>();
+
     public GuiCraftingBook(InventoryPlayer playerInv, World world) {
         super(playerInv, world, 0, 0, 0);
+    }
+
+    private int vanillaCenterLeft() {
+        return (this.width - this.xSize) / 2;
+    }
+
+    private boolean isTabButton(GuiButton btn) {
+        if (btn == null) {
+            return false;
+        }
+        String name = btn.getClass().getName();
+        return name.contains("Tab") || name.contains("tab");
+    }
+
+    private void trackButtons(List buttons) {
+        if (buttons == null) {
+            return;
+        }
+        int base = vanillaCenterLeft();
+        for (Object obj : buttons) {
+            if (obj instanceof GuiButton) {
+                GuiButton btn = (GuiButton) obj;
+                if (isTabButton(btn)) {
+                    continue;
+                }
+                if (!buttonOriginOffset.containsKey(btn)) {
+                    buttonOriginOffset.put(btn, btn.xPosition - base);
+                }
+            }
+        }
+    }
+
+    private void layoutButtons() {
+        if (this.buttonList == null || buttonOriginOffset.isEmpty()) {
+            return;
+        }
+        int anchor = anchorLeft();
+        for (Object obj : this.buttonList) {
+            if (obj instanceof GuiButton) {
+                Integer off = buttonOriginOffset.get(obj);
+                if (off != null) {
+                    ((GuiButton) obj).xPosition = anchor + off;
+                }
+            }
+        }
+    }
+
+    public void adjustPostButtons(List buttonList) {
+        trackButtons(buttonList);
+        layoutButtons();
     }
 
     @Override
     public void initGui() {
         super.initGui();
+        buttonOriginOffset.clear();
         updateScreenPosition();
+        trackButtons(this.buttonList);
+        layoutButtons();
         panel.init(this, 5, 35);
     }
 
@@ -32,6 +96,8 @@ public class GuiCraftingBook extends GuiCrafting implements BookHost {
             this.guiLeft = (this.width - this.xSize) / 2;
         }
         this.guiTop = (this.height - this.ySize) / 2;
+
+        layoutButtons();
     }
 
     private static final net.minecraft.util.ResourceLocation craftingTableGuiTextures =
@@ -39,6 +105,9 @@ public class GuiCraftingBook extends GuiCrafting implements BookHost {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        // After any per-frame guiLeft override, before GuiScreen draws the button list.
+        layoutButtons();
+
         org.lwjgl.opengl.GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(craftingTableGuiTextures);
         this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);

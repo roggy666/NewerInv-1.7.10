@@ -38,6 +38,8 @@ public class BookGuiHandler {
             GuiInventoryBook book = (GuiInventoryBook) event.gui;
             book.updateTabRegistry();
             book.adjustPostButtons(event.buttonList);
+        } else if (event.gui instanceof GuiCraftingBook) {
+            ((GuiCraftingBook) event.gui).adjustPostButtons(event.buttonList);
         }
     }
 

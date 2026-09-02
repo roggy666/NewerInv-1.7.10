@@ -36,6 +36,8 @@ public class BookPanel extends Gui {
 
     public static final int PANEL_WIDTH = 147;
     public static final int PANEL_HEIGHT = 166;
+    /** Keep the panel body on-screen when the host GUI stays centered (e.g. NEI holding guiLeft at center). */
+    private static final int MIN_BOOK_LEFT = 2;
     public static final int PAGE_SIZE = 20;
     public static final int COLS = 5;
     public static final int ROWS = 4;
@@ -71,7 +73,7 @@ public class BookPanel extends Gui {
         this.toggleBtnXOffset = toggleXOffset;
         this.toggleBtnYOffset = toggleYOffset;
 
-        this.bookX = host.anchorLeft() - PANEL_WIDTH;
+        this.bookX = Math.max(MIN_BOOK_LEFT, host.anchorLeft() - PANEL_WIDTH);
         this.bookY = host.anchorTop();
 
         Keyboard.enableRepeatEvents(true);
@@ -299,7 +301,7 @@ public class BookPanel extends Gui {
             refilter();
         }
 
-        bookX = host.anchorLeft() - PANEL_WIDTH;
+        bookX = Math.max(MIN_BOOK_LEFT, host.anchorLeft() - PANEL_WIDTH);
         bookY = host.anchorTop();
         if (searchField != null) {
             searchField.xPosition = bookX + 28;
