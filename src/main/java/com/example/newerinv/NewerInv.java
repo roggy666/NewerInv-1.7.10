@@ -1,6 +1,7 @@
 package com.example.newerinv;
 
 import com.example.newerinv.client.BookGuiHandler;
+import com.example.newerinv.client.NeiCompat;
 import com.example.newerinv.config.Config;
 import com.example.newerinv.recipe.RecipeIndex;
 
@@ -14,7 +15,7 @@ import net.minecraftforge.common.MinecraftForge;
 @Mod(
         modid = NewerInv.MODID,
         name = "NewerInv",
-        version = "1.0.3",
+        version = "1.0.4",
         acceptedMinecraftVersions = "[1.7.10]"
 )
 public class NewerInv {
@@ -31,6 +32,7 @@ public class NewerInv {
     public void init(FMLInitializationEvent event) {
         if (FMLCommonHandler.instance().getSide().isClient()) {
             MinecraftForge.EVENT_BUS.register(new BookGuiHandler());
+            NeiCompat.tryRegister();
         }
     }
 

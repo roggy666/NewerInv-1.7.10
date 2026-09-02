@@ -90,6 +90,7 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
     @Override
     public void initGui() {
         super.initGui();
+        NeiCompat.registerDrawHandler();
         buttonOriginOffset.clear();
         PotionEffectRenderer.disableVanillaPotionEffects(this);
         updateScreenPosition();
@@ -148,8 +149,12 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
         }
     }
 
-    @Override
-    public void updateScreenPosition() {
+    /**
+     * The guiLeft/guiTop we want. Also invoked (via NeiCompat's draw handler) from NEI's onPreDraw
+     * pass, after NEI's LayoutManager re-centers guiLeft and before vanilla GuiContainer.drawScreen
+     * snapshots it, so the inventory still slides aside for the book under NEI.
+     */
+    void applyDesiredPosition() {
         int offX = getSlotXOffset();
         if (BookPanel.isOpen()) {
             this.guiLeft = (this.width - 147 - (this.xSize + offX)) / 2 + 147;
@@ -157,7 +162,11 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
             this.guiLeft = (this.width - (this.xSize + offX)) / 2;
         }
         this.guiTop = (this.height - this.ySize) / 2;
+    }
 
+    @Override
+    public void updateScreenPosition() {
+        applyDesiredPosition();
         layoutButtons();
         updateTabRegistry();
     }

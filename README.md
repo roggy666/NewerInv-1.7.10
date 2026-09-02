@@ -39,7 +39,7 @@ Works on both singleplayer and multiplayer servers without needing server-side i
 ## Installation
 
 1. Install **Minecraft Forge 1.7.10** (build 1614 or newer recommended).
-2. Download `NewerInv-1.0.3.jar` from Releases.
+2. Download `NewerInv-1.0.4.jar` from Releases.
 3. Drop the `.jar` into your `.minecraft/mods` folder.
 4. Launch the game.
 
