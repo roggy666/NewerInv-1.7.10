@@ -1,4 +1,4 @@
-package com.example.newerinv.craft;
+package lol.gzmc.newerinv.craft;
 
 import java.util.ArrayList;
 import java.util.List;

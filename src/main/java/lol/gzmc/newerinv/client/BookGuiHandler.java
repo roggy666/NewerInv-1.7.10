@@ -1,6 +1,6 @@
-package com.example.newerinv.client;
+package lol.gzmc.newerinv.client;
 
-import com.example.newerinv.config.Config;
+import lol.gzmc.newerinv.config.Config;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;

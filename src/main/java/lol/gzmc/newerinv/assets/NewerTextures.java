@@ -1,4 +1,4 @@
-package com.example.newerinv.assets;
+package lol.gzmc.newerinv.assets;
 
 import net.minecraft.util.ResourceLocation;
 

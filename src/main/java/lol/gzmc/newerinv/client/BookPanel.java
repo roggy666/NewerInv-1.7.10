@@ -1,16 +1,16 @@
-package com.example.newerinv.client;
+package lol.gzmc.newerinv.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.example.newerinv.assets.NewerTextures;
-import com.example.newerinv.config.Config;
-import com.example.newerinv.craft.GhostRecipe;
-import com.example.newerinv.craft.GridFiller;
-import com.example.newerinv.craft.GridLayout;
-import com.example.newerinv.recipe.GridRecipe;
-import com.example.newerinv.recipe.RecipeIndex;
+import lol.gzmc.newerinv.assets.NewerTextures;
+import lol.gzmc.newerinv.config.Config;
+import lol.gzmc.newerinv.craft.GhostRecipe;
+import lol.gzmc.newerinv.craft.GridFiller;
+import lol.gzmc.newerinv.craft.GridLayout;
+import lol.gzmc.newerinv.recipe.GridRecipe;
+import lol.gzmc.newerinv.recipe.RecipeIndex;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;

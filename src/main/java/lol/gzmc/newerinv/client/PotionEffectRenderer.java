@@ -1,4 +1,4 @@
-package com.example.newerinv.client;
+package lol.gzmc.newerinv.client;
 
 import java.lang.reflect.Field;
 import java.util.Collection;

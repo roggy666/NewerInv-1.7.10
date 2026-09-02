@@ -1,4 +1,4 @@
-package com.example.newerinv.recipe;
+package lol.gzmc.newerinv.recipe;
 
 import java.util.HashMap;
 import java.util.Map;

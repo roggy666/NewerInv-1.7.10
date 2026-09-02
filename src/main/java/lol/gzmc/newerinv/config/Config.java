@@ -1,8 +1,8 @@
-package com.example.newerinv.config;
+package lol.gzmc.newerinv.config;
 
 import java.io.File;
 
-import com.example.newerinv.NewerInv;
+import lol.gzmc.newerinv.NewerInv;
 
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;

@@ -1,4 +1,4 @@
-package com.example.newerinv.recipe;
+package lol.gzmc.newerinv.recipe;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

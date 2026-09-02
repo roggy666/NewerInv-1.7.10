@@ -1,4 +1,4 @@
-package com.example.newerinv.recipe;
+package lol.gzmc.newerinv.recipe;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;

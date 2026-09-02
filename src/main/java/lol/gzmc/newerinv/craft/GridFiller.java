@@ -1,4 +1,4 @@
-package com.example.newerinv.craft;
+package lol.gzmc.newerinv.craft;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.example.newerinv.recipe.GridRecipe;
-import com.example.newerinv.recipe.Ingredient;
-import com.example.newerinv.recipe.ItemCount;
+import lol.gzmc.newerinv.recipe.GridRecipe;
+import lol.gzmc.newerinv.recipe.Ingredient;
+import lol.gzmc.newerinv.recipe.ItemCount;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerControllerMP;

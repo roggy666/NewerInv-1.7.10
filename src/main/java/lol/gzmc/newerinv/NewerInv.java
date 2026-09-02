@@ -1,9 +1,9 @@
-package com.example.newerinv;
+package lol.gzmc.newerinv;
 
-import com.example.newerinv.client.BookGuiHandler;
-import com.example.newerinv.client.NeiCompat;
-import com.example.newerinv.config.Config;
-import com.example.newerinv.recipe.RecipeIndex;
+import lol.gzmc.newerinv.client.BookGuiHandler;
+import lol.gzmc.newerinv.client.NeiCompat;
+import lol.gzmc.newerinv.config.Config;
+import lol.gzmc.newerinv.recipe.RecipeIndex;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -15,7 +15,7 @@ import net.minecraftforge.common.MinecraftForge;
 @Mod(
         modid = NewerInv.MODID,
         name = "NewerInv",
-        version = "1.0.4",
+        version = "1.0.5",
         acceptedMinecraftVersions = "[1.7.10]"
 )
 public class NewerInv {
