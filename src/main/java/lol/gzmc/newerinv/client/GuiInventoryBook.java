@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lol.gzmc.newerinv.compat.BackpackCompat;
+
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiInventory;
@@ -75,8 +77,17 @@ public class GuiInventoryBook extends GuiInventory implements BookHost {
         }
     }
 
+    /**
+     * Tabs owned by a registry that repositions them itself (TConstruct's TabRegistry, driven from
+     * {@link #updateTabRegistry()}). Those must not be offset-tracked, or both would fight over the
+     * same button. Everything else that merely happens to have "tab" in its class name is a plain
+     * button and is tracked normally -- see {@link BackpackCompat}.
+     */
     private boolean isTabButton(GuiButton btn) {
         if (btn == null) {
+            return false;
+        }
+        if (BackpackCompat.isBackpackTab(btn)) {
             return false;
         }
         String name = btn.getClass().getName();

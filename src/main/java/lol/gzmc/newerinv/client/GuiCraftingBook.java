@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lol.gzmc.newerinv.compat.BackpackCompat;
+
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiCrafting;
@@ -32,8 +34,12 @@ public class GuiCraftingBook extends GuiCrafting implements BookHost {
         return (this.width - this.xSize) / 2;
     }
 
+    /** Mirrors GuiInventoryBook: registry-owned tabs stay untracked, plain tabs are tracked. */
     private boolean isTabButton(GuiButton btn) {
         if (btn == null) {
+            return false;
+        }
+        if (BackpackCompat.isBackpackTab(btn)) {
             return false;
         }
         String name = btn.getClass().getName();

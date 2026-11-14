@@ -14,6 +14,7 @@ public class Config {
     public static boolean openByDefault = true;
     public static boolean craftMaxOnShift = true;
     public static boolean show3x3In2x2Inventory = false;
+    public static boolean debugButtons = false;
 
     private static Configuration cfg;
 
@@ -34,6 +35,8 @@ public class Config {
                 "Shift or right click on a recipe fills the grid for as many crafts as possible");
         show3x3In2x2Inventory = cfg.getBoolean("show3x3In2x2Inventory", "general", show3x3In2x2Inventory,
                 "Show recipes requiring a 3x3 crafting grid in the 2x2 player inventory recipe book");
+        debugButtons = cfg.getBoolean("debugButtons", "general", debugButtons,
+                "Log third-party button positions on every book screen init, for diagnosing misplaced buttons");
 
         if (cfg.hasChanged()) {
             cfg.save();

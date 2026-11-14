@@ -1,6 +1,7 @@
 package lol.gzmc.newerinv.client;
 
 import lol.gzmc.newerinv.config.Config;
+import lol.gzmc.newerinv.debug.ButtonDebug;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -36,10 +37,15 @@ public class BookGuiHandler {
     public void onInitGuiPost(GuiScreenEvent.InitGuiEvent.Post event) {
         if (event.gui instanceof GuiInventoryBook) {
             GuiInventoryBook book = (GuiInventoryBook) event.gui;
+            ButtonDebug.dump("before adjust", event.gui, book, event.buttonList);
             book.updateTabRegistry();
             book.adjustPostButtons(event.buttonList);
+            ButtonDebug.dump("after adjust", event.gui, book, event.buttonList);
         } else if (event.gui instanceof GuiCraftingBook) {
-            ((GuiCraftingBook) event.gui).adjustPostButtons(event.buttonList);
+            GuiCraftingBook book = (GuiCraftingBook) event.gui;
+            ButtonDebug.dump("before adjust", event.gui, book, event.buttonList);
+            book.adjustPostButtons(event.buttonList);
+            ButtonDebug.dump("after adjust", event.gui, book, event.buttonList);
         }
     }
 
